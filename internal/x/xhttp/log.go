@@ -1,23 +1,27 @@
 package xhttp
 
 import (
-	"cmp"
+	"context"
 	"log/slog"
 	"net/http"
+
+	"github.com/rmatsuoka/times_rmatsuoka/internal/x/xslog"
 )
+
+var requestAttrKey = xslog.NewAttrKey()
 
 func LoggingHandler(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logw := &logResponseWriter{ResponseWriter: w}
-		handler.ServeHTTP(logw, req)
-		slog.InfoContext(req.Context(), "request",
+		ctx := context.WithValue(req.Context(), requestAttrKey, slog.Group("request",
 			"method", req.Method,
 			"url", req.URL.String(),
 			"pattern", req.Pattern,
-			"statusCode", cmp.Or(logw.statusCode, 200),
 			"remoteAddr", req.RemoteAddr,
 			"userAgent", req.UserAgent(),
-		)
+		))
+		logw := &logResponseWriter{ResponseWriter: w}
+		handler.ServeHTTP(logw, req.WithContext(ctx))
+		slog.InfoContext(ctx, "request", "statusCode", logw.statusCode)
 	})
 }
 
