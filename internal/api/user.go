@@ -15,3 +15,13 @@ func (api *API) createUser(w http.ResponseWriter, req *http.Request, user *userc
 	}
 	xhttp.WriteJSON(w, 200, map[string]any{"id": id})
 }
+
+func (api *API) getUser(w http.ResponseWriter, req *http.Request) {
+	userCode := req.PathValue("userCode")
+	u, err := usercmd.Get(req.Context(), api.DB, userCode)
+	if err != nil {
+		xhttp.WriteJSON(w, 500, map[string]any{"message": err.Error()})
+		return
+	}
+	xhttp.WriteJSON(w, 200, map[string]any{"user": u})
+}
