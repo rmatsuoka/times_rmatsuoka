@@ -31,8 +31,8 @@ func (h *ContextHandler) Handle(ctx context.Context, r slog.Record) error {
 	attrKeyMu.RLock()
 	defer attrKeyMu.RUnlock()
 
-	for key := range nAttrKey {
-		if attr, ok := ctx.Value(key).(slog.Attr); ok {
+	for id := range nAttrKey {
+		if attr, ok := ctx.Value(AttrKey{id: id}).(slog.Attr); ok {
 			r.AddAttrs(attr)
 		}
 	}

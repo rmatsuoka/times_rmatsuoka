@@ -2,10 +2,12 @@ package xslog
 
 import "sync"
 
-type AttrKey int
+type AttrKey struct {
+	id int
+}
 
 var (
-	nAttrKey AttrKey = 0
+	nAttrKey = 0
 
 	attrKeyMu = &sync.RWMutex{}
 )
@@ -14,7 +16,7 @@ func NewAttrKey() AttrKey {
 	attrKeyMu.Lock()
 	defer attrKeyMu.Unlock()
 
-	key := nAttrKey
+	id := nAttrKey
 	nAttrKey++
-	return key
+	return AttrKey{id: id}
 }
