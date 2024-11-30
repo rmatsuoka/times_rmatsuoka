@@ -11,22 +11,20 @@ func loggerWithPC(logger *slog.Logger, callerskip int, args ...any) *slog.Logger
 	var pcs [1]uintptr
 	// skip [Callers] + callerskip
 	runtime.Callers(1+callerskip, pcs[:])
+	logger = logger.With(args...)
 
 	return slog.New(&handler{
 		Handler: logger.Handler(),
 		pc:      pcs[0],
-		args:    args,
 	})
 }
 
 type handler struct {
 	slog.Handler
-	pc   uintptr
-	args []any
+	pc uintptr
 }
 
 func (h *handler) Handle(ctx context.Context, r slog.Record) error {
 	r.PC = h.pc
-	r.Add(h.args...)
 	return h.Handler.Handle(ctx, r)
 }
