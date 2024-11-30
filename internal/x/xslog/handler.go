@@ -20,11 +20,11 @@ func (h *ContextHandler) Enabled(ctx context.Context, level slog.Level) bool {
 }
 
 func (h *ContextHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return &ContextHandler{handler: h.WithAttrs(attrs)}
+	return &ContextHandler{handler: h.handler.WithAttrs(attrs)}
 }
 
 func (h *ContextHandler) WithGroup(name string) slog.Handler {
-	return &ContextHandler{handler: h.WithGroup(name)}
+	return &ContextHandler{handler: h.handler.WithGroup(name)}
 }
 
 func (h *ContextHandler) Handle(ctx context.Context, r slog.Record) error {
