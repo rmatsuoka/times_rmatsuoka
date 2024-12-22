@@ -1,0 +1,9 @@
+#!/bin/sh
+
+docker run \
+  --rm \
+  --volume $(pwd):/workspace \
+  --workdir /workspace \
+  --user "$(id -u):$(id -g)" \
+  arigaio/atlas:0.29.1-community \
+  "$@"
