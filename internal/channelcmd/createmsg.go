@@ -32,7 +32,7 @@ func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode str
 			return err
 		}
 
-		cuser, err := c.channelUser(ctx, tx, cid, uid)
+		cuser, err := c.channelMember(ctx, tx, cid, uid)
 		if err != nil {
 			return err
 		}
@@ -51,8 +51,8 @@ func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode str
 	return mid, err
 }
 
-func (c *Command) channelUser(ctx context.Context, db xsql.Querier, cid channels.ID, uid users.ID) (*channels.ChannelUser, error) {
-	channelUserID, err := c.Repository.Channels.User(ctx, db, cid, uid)
+func (c *Command) channelMember(ctx context.Context, db xsql.Querier, cid channels.ID, uid users.ID) (*channels.Member, error) {
+	memberID, err := c.Repository.Channels.Member(ctx, db, cid, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *Command) channelUser(ctx context.Context, db xsql.Querier, cid channels
 		return nil, err
 	}
 
-	return channels.ChannelUserFromID(user, channelUserID), nil
+	return channels.MemberFromID(user, memberID), nil
 }
 
 func CreateMessage(ctx context.Context, db xsql.DB, channelCode string, message *CreatingMessage) (channels.MessageID, error) {

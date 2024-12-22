@@ -37,23 +37,23 @@ func ValidateCreating(c Creating) (ValidCreating, error) {
 	return ValidCreating{c}, nil
 }
 
-type ChannelUserID struct {
+type MemberID struct {
 	Channel ID
 	User    users.ID
 	Role    Role
 }
 
-type ChannelUser struct {
+type Member struct {
 	Channel ID
 	*users.User
 	Role Role
 }
 
-func ChannelUserFromID(user *users.User, cuid *ChannelUserID) *ChannelUser {
-	return &ChannelUser{
-		Channel: cuid.Channel,
+func MemberFromID(user *users.User, mid *MemberID) *Member {
+	return &Member{
+		Channel: mid.Channel,
 		User:    user,
-		Role:    cuid.Role,
+		Role:    mid.Role,
 	}
 }
 

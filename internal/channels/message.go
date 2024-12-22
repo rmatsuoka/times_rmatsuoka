@@ -33,6 +33,6 @@ func ValidateCreatingMessage(c CreatingMessage) (ValidCreatingMessage, error) {
 	return ValidCreatingMessage{c}, nil
 }
 
-func CanCreateMessage(cuser *ChannelUser) bool {
-	return cuser.Role == RoleAdmin || cuser.Role == RoleWriter
+func CanCreateMessage(member *Member) bool {
+	return member.Role == RoleAdmin || member.Role == RoleWriter
 }

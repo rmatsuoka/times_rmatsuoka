@@ -28,7 +28,7 @@ func (c *Command) Create(ctx context.Context, db xsql.DB, channel *Creating) (ch
 		if err != nil {
 			return err
 		}
-		return c.Repository.Channels.AddUser(ctx, tx, &channels.ChannelUserID{
+		return c.Repository.Channels.AddMember(ctx, tx, &channels.MemberID{
 			Channel: cid,
 			User:    u,
 			Role:    channels.RoleOwenr,

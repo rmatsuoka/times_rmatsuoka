@@ -13,9 +13,9 @@ type Channels interface {
 	GetByCode(context.Context, xsql.Querier, string) (*channels.Channel, error)
 	Create(context.Context, xsql.Tx, channels.ValidCreating) (channels.ID, error)
 
-	AddUser(context.Context, xsql.Tx, *channels.ChannelUserID) error
-	Users(context.Context, xsql.Querier, channels.ID) ([]*channels.ChannelUserID, error)
-	User(context.Context, xsql.Querier, channels.ID, users.ID) (*channels.ChannelUserID, error)
+	AddMember(context.Context, xsql.Tx, *channels.MemberID) error
+	Members(context.Context, xsql.Querier, channels.ID) ([]*channels.MemberID, error)
+	Member(context.Context, xsql.Querier, channels.ID, users.ID) (*channels.MemberID, error)
 }
 
 type CreatingMessage struct {
