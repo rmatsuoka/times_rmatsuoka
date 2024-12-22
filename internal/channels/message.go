@@ -13,12 +13,11 @@ type MessageID interface {
 
 type Message struct {
 	ID         MessageID
-	User       users.User
+	UserID     users.ID
 	Channel    ID
 	Text       string
 	CreatedAt  time.Time
 	ModifiedAt time.Time
-	Modified   bool
 }
 
 type CreatingMessage interface {

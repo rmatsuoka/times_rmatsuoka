@@ -38,15 +38,17 @@ func ValidateCreating(c Creating) (ValidCreating, error) {
 }
 
 type MemberID struct {
-	Channel ID
-	User    users.ID
-	Role    Role
+	Channel   ID
+	User      users.ID
+	Role      Role
+	CreatedAt time.Time
 }
 
 type Member struct {
 	Channel ID
 	*users.User
-	Role Role
+	Role      Role
+	CreatedAt time.Time
 }
 
 func MemberFromID(user *users.User, mid *MemberID) *Member {
