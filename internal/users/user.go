@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// ID must be a comparable type.
 type ID interface {
 	String() string
 	UserID()
