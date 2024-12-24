@@ -10,7 +10,7 @@ import (
 )
 
 var open = sync.OnceValues(func() (*sql.DB, error) {
-	return sql.Open("sqlite3", "file:../../local.db?_fk=1")
+	return sql.Open("sqlite3", "file:../../../local.db?_fk=1")
 })
 
 func Open() xsql.DB {

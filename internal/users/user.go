@@ -20,6 +20,9 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+func (u *User) UserCode() string { return u.Code }
+func (u *User) UserName() string { return u.Name }
+
 type Creating interface {
 	UserCode() string
 	UserName() string
@@ -29,7 +32,7 @@ type ValidCreating struct {
 	Creating
 }
 
-var validCode = regexp.MustCompile("[A-Za-z0-9_]{,30}")
+var validCode = regexp.MustCompile("[A-Za-z0-9_]{3,30}")
 
 func ValidateCreating(u Creating) (ValidCreating, error) {
 	if !validCode.MatchString(u.UserCode()) {
