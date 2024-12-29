@@ -3,9 +3,12 @@ package diff
 import (
 	"cmp"
 	"fmt"
+	"iter"
 	"maps"
 	"slices"
 	"strings"
+
+	"github.com/rmatsuoka/times_rmatsuoka/internal/x/xiter"
 )
 
 func Maps[M ~map[K]V, K comparable, V comparable](m, n M) string {
@@ -21,34 +24,39 @@ func OrderedMaps[M ~map[K]V, K cmp.Ordered, V comparable](m, n M) string {
 }
 
 func OrderedMapsFunc[M ~map[K]V, K cmp.Ordered, V any](m, n M, equal func(V, V) bool) string {
-	return orderedMapsFunc(m, n, cmp.Compare, equal)
+	return orderedSeq2Func(maps.All(m), maps.All(n), cmp.Compare, equal)
 }
 
-func orderedMapsFunc[M ~map[K]V, K comparable, V any](m, n M, cmp func(K, K) int, equal func(V, V) bool) string {
+func orderedSeq2Func[K comparable, V any](m, n iter.Seq2[K, V], cmp func(K, K) int, equal func(V, V) bool) string {
 	b := new(strings.Builder)
-	mkeys := slices.SortedFunc(maps.Keys(m), cmp)
-	nkeys := slices.SortedFunc(maps.Keys(n), cmp)
+
+	mkvs := xiter.Collect2(m)
+	nkvs := xiter.Collect2(n)
+
+	slices.SortFunc(mkvs, func(x, y xiter.KV[K, V]) int { return cmp(x.K, y.K) })
+	slices.SortFunc(nkvs, func(x, y xiter.KV[K, V]) int { return cmp(x.K, y.K) })
+
 	ni := 0
-	for _, key := range mkeys {
-		for ni < len(nkeys) && cmp(key, nkeys[ni]) > 0 {
-			fmt.Fprintf(b, "+ %v: %+v\n", nkeys[ni], n[nkeys[ni]])
+	for mi := range mkvs {
+		for ni < len(nkvs) && cmp(mkvs[mi].K, nkvs[ni].K) > 0 {
+			fmt.Fprintf(b, "+ %v: %+v\n", nkvs[ni].K, nkvs[ni].V)
 			ni++
 		}
 
-		if ni < len(nkeys) && cmp(key, nkeys[ni]) == 0 {
-			if equal(m[key], n[key]) {
-				fmt.Fprintf(b, "  %v: %+v\n", key, m[key])
+		if ni < len(nkvs) && cmp(mkvs[mi].K, nkvs[ni].K) == 0 {
+			if equal(mkvs[mi].V, nkvs[ni].V) {
+				fmt.Fprintf(b, "  %v: %+v\n", mkvs[mi].K, mkvs[mi].V)
 			} else {
-				fmt.Fprintf(b, "- %v: %+v\n", key, m[key])
-				fmt.Fprintf(b, "+ %v: %+v\n", key, n[key])
+				fmt.Fprintf(b, "- %v: %+v\n", mkvs[mi].K, mkvs[mi].V)
+				fmt.Fprintf(b, "+ %v: %+v\n", mkvs[mi].K, nkvs[ni].V)
 			}
 			ni++
 		} else {
-			fmt.Fprintf(b, "- %v: %+v\n", key, m[key])
+			fmt.Fprintf(b, "- %v: %+v\n", mkvs[mi].K, mkvs[mi].V)
 		}
 	}
-	for ; ni < len(nkeys); ni++ {
-		fmt.Fprintf(b, "+ %v: %+v\n", nkeys[ni], n[nkeys[ni]])
+	for ; ni < len(nkvs); ni++ {
+		fmt.Fprintf(b, "+ %v: %+v\n", nkvs[ni].K, nkvs[ni].V)
 	}
 	return b.String()
 }
