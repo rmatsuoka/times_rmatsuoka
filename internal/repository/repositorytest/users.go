@@ -8,6 +8,7 @@ import (
 	"slices"
 
 	"github.com/rmatsuoka/times_rmatsuoka/internal/repository"
+	"github.com/rmatsuoka/times_rmatsuoka/internal/types"
 	"github.com/rmatsuoka/times_rmatsuoka/internal/users"
 	"github.com/rmatsuoka/times_rmatsuoka/internal/x/diff"
 	"github.com/rmatsuoka/times_rmatsuoka/internal/x/xsql"
@@ -43,6 +44,10 @@ func TestUsers(ctx context.Context, repo repository.Users, db xsql.DB) error {
 				return fmt.Errorf("repo.Create(ctx, tx, %#v) returned non-nil error: %w", u, err)
 			}
 			userMap[id] = u
+			_, err = repo.Create(ctx, tx, users.ValidCreating{Creating: u})
+			if !errors.Is(err, types.ErrExist) {
+				return fmt.Errorf("repo.Create(ctx, tx, %#v) twice time returned %q as error, want %q as err", u, err, types.ErrExist)
+			}
 		}
 
 		for id, u := range userMap {

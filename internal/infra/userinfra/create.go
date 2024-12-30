@@ -15,5 +15,5 @@ func (Users) Create(ctx context.Context, tx xsql.Tx, user users.ValidCreating) (
 		values
 			(?, ?)
 	`, user.UserCode(), user.UserName())
-	return infratypes.UserID(id), err
+	return infratypes.UserID(id), infratypes.WrapError(err)
 }

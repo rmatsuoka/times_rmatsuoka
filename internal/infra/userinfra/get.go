@@ -20,13 +20,13 @@ func (Users) Get(ctx context.Context, db xsql.Querier, id users.ID) (*users.User
 		where
 			id = ?
 	`, id.(infratypes.UserID))(&u.ID, &u.Code, &u.Name, &u.CreatedAt, &u.UpdatedAt)
-	return infratypes.UsersUser(&u), err
+	return infratypes.UsersUser(&u), infratypes.WrapError(err)
 }
 
 func (Users) ID(ctx context.Context, db xsql.Querier, code string) (users.ID, error) {
 	var id infratypes.UserID
 	err := db.QueryRow(ctx, `select id from users where code = ?`, code)(&id)
-	return id, err
+	return id, infratypes.WrapError(err)
 }
 
 func (Users) GetByCode(ctx context.Context, db xsql.Querier, code string) (*users.User, error) {
@@ -39,7 +39,7 @@ func (Users) GetByCode(ctx context.Context, db xsql.Querier, code string) (*user
 		where
 			code = ?
 	`, code)(&u.ID, &u.Code, &u.Name, &u.CreatedAt, &u.UpdatedAt)
-	return infratypes.UsersUser(&u), err
+	return infratypes.UsersUser(&u), infratypes.WrapError(err)
 }
 
 func (Users) GetMany(ctx context.Context, db xsql.Querier, ids iter.Seq[users.ID]) (map[users.ID]*users.User, error) {
@@ -65,5 +65,5 @@ func (Users) GetMany(ctx context.Context, db xsql.Querier, ids iter.Seq[users.ID
 		scan(&u.ID, &u.Code, &u.Name, &u.CreatedAt, &u.UpdatedAt)
 		usermap[infratypes.UserID(u.ID)] = infratypes.UsersUser(&u)
 	})
-	return usermap, err
+	return usermap, infratypes.WrapError(err)
 }
