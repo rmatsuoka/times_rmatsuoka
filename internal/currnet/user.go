@@ -8,12 +8,12 @@ import (
 
 type key int
 
-const clientKey = key(0)
+const userIDKey = key(0)
 
-func FromContext(ctx context.Context) users.ID {
-	panic("not implement")
+func UserID(ctx context.Context) users.ID {
+	return ctx.Value(userIDKey).(users.ID)
 }
 
-func NewContext(ctx context.Context, id users.ID) context.Context {
-	return context.WithValue(ctx, clientKey, id)
+func ContextWithUserID(ctx context.Context, id users.ID) context.Context {
+	return context.WithValue(ctx, userIDKey, id)
 }

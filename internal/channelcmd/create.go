@@ -15,7 +15,7 @@ type Creating struct {
 func (c *Creating) ChannelCode() string { return c.Code }
 
 func (c *Command) Create(ctx context.Context, db xsql.DB, channel *Creating) (channels.ID, error) {
-	u := currnet.FromContext(ctx)
+	u := currnet.UserID(ctx)
 
 	vchannel, err := channels.ValidateCreating(channel)
 	if err != nil {

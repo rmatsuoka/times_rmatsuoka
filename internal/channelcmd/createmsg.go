@@ -18,7 +18,7 @@ type CreatingMessage struct {
 func (c *CreatingMessage) MessageText() string { return c.Text }
 
 func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode string, message *CreatingMessage) (channels.MessageID, error) {
-	uid := currnet.FromContext(ctx)
+	uid := currnet.UserID(ctx)
 
 	vmessage, err := channels.ValidateCreatingMessage(message)
 	if err != nil {
