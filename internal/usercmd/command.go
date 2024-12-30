@@ -15,4 +15,4 @@ func (c *Command) repository() *repository.Repository {
 	return cmp.Or(c.Repository, repository.Default())
 }
 
-var Default *Command
+var Default = &Command{}
