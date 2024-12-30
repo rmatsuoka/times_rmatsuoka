@@ -13,11 +13,11 @@ type ID interface {
 }
 
 type User struct {
-	ID        ID
-	Code      string
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        ID        `json:"id"`
+	Code      string    `json:"code"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (u *User) UserCode() string { return u.Code }
