@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/rmatsuoka/times_rmatsuoka/internal/channels"
-	"github.com/rmatsuoka/times_rmatsuoka/internal/clients"
+	"github.com/rmatsuoka/times_rmatsuoka/internal/currnet"
 	"github.com/rmatsuoka/times_rmatsuoka/internal/repository"
 	"github.com/rmatsuoka/times_rmatsuoka/internal/users"
 	"github.com/rmatsuoka/times_rmatsuoka/internal/x/xsql"
@@ -18,7 +18,7 @@ type CreatingMessage struct {
 func (c *CreatingMessage) MessageText() string { return c.Text }
 
 func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode string, message *CreatingMessage) (channels.MessageID, error) {
-	uid := clients.FromContext(ctx)
+	uid := currnet.FromContext(ctx)
 
 	vmessage, err := channels.ValidateCreatingMessage(message)
 	if err != nil {
