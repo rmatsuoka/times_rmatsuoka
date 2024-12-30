@@ -14,12 +14,12 @@ func (c *Command) Update(ctx context.Context, db xsql.DB, code string, user *Cre
 	}
 
 	return db.WithinTx(ctx, func(ctx context.Context, tx xsql.Tx) error {
-		id, err := c.repository().Users.ID(ctx, tx, code)
+		id, err := c.Users().ID(ctx, tx, code)
 		if err != nil {
 			return err
 		}
 
-		return c.repository().Users.Update(ctx, tx, id, validated)
+		return c.Users().Update(ctx, tx, id, validated)
 	})
 }
 

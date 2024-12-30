@@ -21,7 +21,7 @@ func (c *Command) Create(ctx context.Context, db xsql.DB, user *Creating) (id us
 		return nil, err
 	}
 	err = db.WithinTx(ctx, func(ctx context.Context, tx xsql.Tx) error {
-		id, err = c.repository().Users.Create(ctx, tx, vuser)
+		id, err = c.Users().Create(ctx, tx, vuser)
 		return err
 	})
 	return id, err

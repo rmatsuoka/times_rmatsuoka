@@ -8,7 +8,7 @@ import (
 )
 
 func (c *Command) Get(ctx context.Context, db xsql.DB, code string) (*users.User, error) {
-	return c.repository().Users.GetByCode(ctx, db, code)
+	return c.Users().GetByCode(ctx, db, code)
 }
 
 func Get(ctx context.Context, db xsql.DB, code string) (*users.User, error) {

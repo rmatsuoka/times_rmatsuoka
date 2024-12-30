@@ -15,4 +15,8 @@ func (c *Command) repository() *repository.Repository {
 	return cmp.Or(c.Repository, repository.Default())
 }
 
+func (c *Command) Users() repository.Users {
+	return c.repository().Users
+}
+
 var Default = &Command{}
