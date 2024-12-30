@@ -7,7 +7,7 @@ import (
 )
 
 func Init() {
-	repository.InitDefault(&repository.Repository{
+	repository.InitDefault(&repository.Repositories{
 		Users:    userinfra.Users{},
 		Channels: nil,
 		Messages: nil,

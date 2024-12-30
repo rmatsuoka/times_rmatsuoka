@@ -8,15 +8,15 @@ import (
 
 // Command provides a general manipulation for user repository.
 type Command struct {
-	Repository *repository.Repository
+	Repositories *repository.Repositories
 }
 
-func (c *Command) repository() *repository.Repository {
-	return cmp.Or(c.Repository, repository.Default())
+func (c *Command) repositories() *repository.Repositories {
+	return cmp.Or(c.Repositories, repository.Default())
 }
 
 func (c *Command) Users() repository.Users {
-	return c.repository().Users
+	return c.repositories().Users
 }
 
 var Default = &Command{}

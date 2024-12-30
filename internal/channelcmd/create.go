@@ -24,11 +24,11 @@ func (c *Command) Create(ctx context.Context, db xsql.DB, channel *Creating) (ch
 
 	var cid channels.ID
 	err = db.WithinTx(ctx, func(ctx context.Context, tx xsql.Tx) error {
-		cid, err = c.repository().Channels.Create(ctx, tx, vchannel)
+		cid, err = c.repositories().Channels.Create(ctx, tx, vchannel)
 		if err != nil {
 			return err
 		}
-		return c.repository().Channels.AddMember(ctx, tx, &channels.MemberID{
+		return c.repositories().Channels.AddMember(ctx, tx, &channels.MemberID{
 			Channel: cid,
 			User:    u,
 			Role:    channels.RoleOwenr,

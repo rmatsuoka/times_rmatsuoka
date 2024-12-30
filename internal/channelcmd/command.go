@@ -7,11 +7,11 @@ import (
 )
 
 type Command struct {
-	Repository *repository.Repository
+	Repositories *repository.Repositories
 }
 
-func (c *Command) repository() *repository.Repository {
-	return cmp.Or(c.Repository, repository.Default())
+func (c *Command) repositories() *repository.Repositories {
+	return cmp.Or(c.Repositories, repository.Default())
 }
 
 var Default = &Command{}
