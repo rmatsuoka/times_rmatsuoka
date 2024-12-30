@@ -27,7 +27,7 @@ func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode str
 
 	var mid channels.MessageID
 	err = db.WithinTx(ctx, func(ctx context.Context, tx xsql.Tx) error {
-		cid, err := c.Repository.Channels.ID(ctx, tx, channelCode)
+		cid, err := c.repository().Channels.ID(ctx, tx, channelCode)
 		if err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode str
 			return fmt.Errorf("no permission to post message")
 		}
 
-		mid, err = c.Repository.Messages.Create(ctx, tx, &repository.CreatingMessage{
+		mid, err = c.repository().Messages.Create(ctx, tx, &repository.CreatingMessage{
 			Message: vmessage,
 			User:    uid,
 			Channel: cid,
@@ -52,12 +52,12 @@ func (c *Command) CreateMessage(ctx context.Context, db xsql.DB, channelCode str
 }
 
 func (c *Command) channelMember(ctx context.Context, db xsql.Querier, cid channels.ID, uid users.ID) (*channels.Member, error) {
-	memberID, err := c.Repository.Channels.Member(ctx, db, cid, uid)
+	memberID, err := c.repository().Channels.Member(ctx, db, cid, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := c.Repository.Users.Get(ctx, db, uid)
+	user, err := c.repository().Users.Get(ctx, db, uid)
 	if err != nil {
 		return nil, err
 	}
