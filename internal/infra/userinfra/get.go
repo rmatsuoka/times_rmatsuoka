@@ -19,14 +19,14 @@ func (Users) Get(ctx context.Context, db xsql.Querier, id users.ID) (*users.User
 			users
 		where
 			id = ?
-	`, id.(infratypes.UserID))(&u.ID, &u.Code, &u.Name, &u.CreatedAt, &u.UpdatedAt)
+	`, id)(&u.ID, &u.Code, &u.Name, &u.CreatedAt, &u.UpdatedAt)
 	return infratypes.UsersUser(&u), infratypes.WrapError(err)
 }
 
 func (Users) ID(ctx context.Context, db xsql.Querier, code string) (users.ID, error) {
-	var id infratypes.UserID
+	var id int64
 	err := db.QueryRow(ctx, `select id from users where code = ?`, code)(&id)
-	return id, infratypes.WrapError(err)
+	return infratypes.UserID(id), infratypes.WrapError(err)
 }
 
 func (Users) GetByCode(ctx context.Context, db xsql.Querier, code string) (*users.User, error) {
@@ -47,8 +47,6 @@ func (Users) GetMany(ctx context.Context, db xsql.Querier, ids iter.Seq[users.ID
 	if len(slice) == 0 {
 		return nil, nil
 	}
-
-	_ = slice[0].(infratypes.UserID) // assert that type of userid is infratypes.UserID.
 
 	q := xsql.ListQuery(`
 		select

@@ -17,11 +17,11 @@ select
 from
 	users
 where
-	id = ?`, id.(infratypes.UserID))
+	id = ?`, id)
 	if err != nil {
 		return infratypes.WrapError(err)
 	}
 
-	err = tx.Exec(ctx, `delete from users where id = ?`, id.(infratypes.UserID))
+	err = tx.Exec(ctx, `delete from users where id = ?`, id)
 	return infratypes.WrapError(err)
 }

@@ -29,6 +29,6 @@ set
 	name = ?
 where
 	id = ?
-`, user.UserCode(), user.UserName(), id.(infratypes.UserID))
+`, user.UserCode(), user.UserName(), id)
 	return infratypes.WrapError(err)
 }

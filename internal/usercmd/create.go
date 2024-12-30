@@ -18,7 +18,7 @@ func (u *Creating) UserCode() string { return u.Code }
 func (c *Command) Create(ctx context.Context, db xsql.DB, user *Creating) (id users.ID, err error) {
 	vuser, err := users.ValidateCreating(user)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	err = db.WithinTx(ctx, func(ctx context.Context, tx xsql.Tx) error {
 		id, err = c.Users().Create(ctx, tx, vuser)

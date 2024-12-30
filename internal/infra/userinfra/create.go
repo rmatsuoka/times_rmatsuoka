@@ -11,7 +11,7 @@ import (
 func (Users) Create(ctx context.Context, tx xsql.Tx, user users.ValidCreating) (users.ID, error) {
 	err := tx.Exec(ctx, `insert into usercodes (code) values (?)`, user.UserCode())
 	if err != nil {
-		return nil, infratypes.WrapError(err)
+		return "", infratypes.WrapError(err)
 	}
 
 	id, err := tx.ExecLastInsertID(ctx, `

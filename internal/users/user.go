@@ -6,11 +6,7 @@ import (
 	"time"
 )
 
-// ID must be a comparable type.
-type ID interface {
-	String() string
-	UserID()
-}
+type ID string
 
 type User struct {
 	ID        ID        `json:"id"`
