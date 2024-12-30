@@ -16,5 +16,5 @@ type Users interface {
 	Create(ctx context.Context, tx xsql.Tx, user users.ValidCreating) (users.ID, error)
 
 	// Update(ctx context.Context, tx xsql.Tx, id int64, user CreateUser) error
-	// Delete(ctx context.Context, tx xsql.Tx, id int64) error
+	Delete(ctx context.Context, tx xsql.Tx, id users.ID) error
 }

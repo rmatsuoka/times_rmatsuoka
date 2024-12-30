@@ -10,8 +10,8 @@ import (
 func (api *API) createUser(w http.ResponseWriter, req *http.Request, user *usercmd.Creating) {
 	id, err := usercmd.Create(req.Context(), api.DB, user)
 	writeResult(w, struct {
-		ID string `json:"id"`
-	}{ID: id.String()}, err)
+		ID users.ID `json:"id"`
+	}{ID: id}, err)
 }
 
 func (api *API) getUser(w http.ResponseWriter, req *http.Request) {
@@ -20,4 +20,10 @@ func (api *API) getUser(w http.ResponseWriter, req *http.Request) {
 	writeResult(w, struct {
 		User *users.User `json:"user"`
 	}{User: u}, err)
+}
+
+func (api *API) deleteUser(w http.ResponseWriter, req *http.Request) {
+	userCode := req.PathValue("userCode")
+	err := usercmd.Delete(req.Context(), api.DB, userCode)
+	writeResult(w, empty, err)
 }
