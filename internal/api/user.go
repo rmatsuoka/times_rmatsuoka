@@ -27,3 +27,9 @@ func (api *API) deleteUser(w http.ResponseWriter, req *http.Request) {
 	err := usercmd.Delete(req.Context(), api.DB, userCode)
 	writeResult(w, empty, err)
 }
+
+func (api *API) updateUser(w http.ResponseWriter, req *http.Request, user *usercmd.Creating) {
+	userCode := req.PathValue("userCode")
+	err := usercmd.Update(req.Context(), api.DB, userCode, user)
+	writeResult(w, empty, err)
+}

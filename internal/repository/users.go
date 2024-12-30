@@ -15,6 +15,6 @@ type Users interface {
 	GetMany(ctx context.Context, db xsql.Querier, ids iter.Seq[users.ID]) (map[users.ID]*users.User, error)
 	Create(ctx context.Context, tx xsql.Tx, user users.ValidCreating) (users.ID, error)
 
-	// Update(ctx context.Context, tx xsql.Tx, id int64, user CreateUser) error
+	Update(ctx context.Context, tx xsql.Tx, id users.ID, user users.ValidCreating) error
 	Delete(ctx context.Context, tx xsql.Tx, id users.ID) error
 }
