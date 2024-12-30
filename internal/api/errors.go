@@ -21,7 +21,8 @@ type statusJSON struct {
 }
 
 var errStatus = map[error]int{
-	types.ErrExist: http.StatusConflict,
+	types.ErrNotFound: http.StatusNotFound,
+	types.ErrExist:    http.StatusConflict,
 }
 
 var empty = struct{}{}
