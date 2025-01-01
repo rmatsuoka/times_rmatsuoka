@@ -2,16 +2,15 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
 
 	"github.com/gorilla/sessions"
 	oauth1 "github.com/rmatsuoka/dghubble-oauth1"
+	"github.com/rmatsuoka/times_rmatsuoka/internal/currnet"
+	"github.com/rmatsuoka/times_rmatsuoka/internal/users"
+	"github.com/rmatsuoka/times_rmatsuoka/internal/x/xhttp"
 )
 
 var (
@@ -28,7 +27,8 @@ var (
 var store = sessions.NewCookieStore([]byte(sessionKey))
 
 type Auth struct {
-	config *oauth1.Config
+	config       *oauth1.Config
+	callbackFunc func(context.Context, HatenaMy) (users.ID, error)
 }
 
 func New() *Auth {
@@ -102,6 +102,7 @@ func (a *Auth) callback(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	session, err := store.Get(req, "user")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -127,17 +128,19 @@ func (a *Auth) callback(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	client := a.config.Client(req.Context(), oauth1.NewToken(accessToken, accessSecret))
+	client := &xhttp.Client{
+		Client: a.config.Client(req.Context(), oauth1.NewToken(accessToken, accessSecret)),
+	}
 
-	my, err := getHatenaMy(req.Context(), client)
+	var my HatenaMy
+	err = client.GetJSON(req.Context(), "https://n.hatena.com/applications/my.json", &my)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	session.Values["url_name"] = my.URLName
-	session.Values["display_name"] = my.DisplayName
-	session.Values["profile_image_url"] = my.ProfileImageURL
+	id, err := a.callbackFunc(req.Context(), my)
+	session.Values["user_id"] = id
 
 	if err := session.Save(req, w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -153,40 +156,6 @@ type HatenaMy struct {
 	ProfileImageURL string `json:"profile_image_url"`
 }
 
-func getHatenaMy(ctx context.Context, client *http.Client) (HatenaMy, error) {
-	newReq, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://n.hatena.com/applications/my.json", http.NoBody)
-	if err != nil {
-		return HatenaMy{}, fmt.Errorf("auth.getHatenaMy: %w", err)
-	}
-	res, err := client.Do(newReq)
-	if err != nil {
-		return HatenaMy{}, fmt.Errorf("auth.getHatenaMy: %w", err)
-	}
-	defer res.Body.Close()
-
-	buf, err := io.ReadAll(res.Body)
-	if err != nil {
-		return HatenaMy{}, fmt.Errorf("auth.getHatenaMy: %w", err)
-	}
-	var my HatenaMy
-	err = json.Unmarshal(buf, &my)
-	if err != nil {
-		return HatenaMy{}, fmt.Errorf("auth.getHatenaMy: %w", err)
-	}
-	slog.Info("login", "my", my)
-	return my, nil
-}
-
-type ctxkey int
-
-// userKey is a key of username contained in context. Its associated value type is string.
-var userKey = ctxkey(0)
-
-func MyFromContext(ctx context.Context) (HatenaMy, bool) {
-	my, ok := ctx.Value(userKey).(HatenaMy)
-	return my, ok
-}
-
 func AuthHandler(handler http.Handler, fallback func(w http.ResponseWriter, req *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		session, err := store.Get(req, "user")
@@ -194,25 +163,20 @@ func AuthHandler(handler http.Handler, fallback func(w http.ResponseWriter, req 
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		my := HatenaMy{}
-		URLName, ok := session.Values["url_name"]
+		userIDStr, ok := session.Values["url_name"]
 		if !ok {
 			fallback(w, req)
 			return
 		}
-		my.URLName = URLName.(string)
-		my.DisplayName = session.Values["display_name"].(string)
-		my.ProfileImageURL = session.Values["profile_image_url"].(string)
 
-		ctx := context.WithValue(req.Context(), userKey, my)
-		req = req.WithContext(ctx)
-
-		if err := session.Save(req, w); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		userID, ok := userIDStr.(string)
+		if !ok {
+			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
 
+		ctx := currnet.ContextWithUserID(req.Context(), users.ID(userID))
+		req = req.WithContext(ctx)
 		handler.ServeHTTP(w, req)
 	})
 }
